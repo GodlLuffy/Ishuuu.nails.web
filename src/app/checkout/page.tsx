@@ -14,8 +14,11 @@ import {
   ShieldCheck, 
   Tag, 
   ArrowRight,
-  AlertCircle
+  AlertCircle,
+  X,
+  Info
 } from 'lucide-react';
+import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon';
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -40,6 +43,13 @@ export default function CheckoutPage() {
 
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [demoOrderPopup, setDemoOrderPopup] = useState<{
+    orderNumber: string;
+    customerName: string;
+    total: number;
+    items: typeof items;
+    isSavedInDb: boolean;
+  } | null>(null);
 
   // Calculations
   const subtotal = items.reduce((acc, it) => acc + it.price * it.quantity, 0);
@@ -83,6 +93,10 @@ export default function CheckoutPage() {
     setSubmitError(null);
 
     try {
+      const snapshotItems = [...items];
+      const snapshotTotal = finalTotal;
+      const snapshotName = customerName;
+
       const res = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -103,20 +117,42 @@ export default function CheckoutPage() {
 
       if (res.ok) {
         const order = await res.json();
+        setDemoOrderPopup({
+          orderNumber: order.orderNumber,
+          customerName: snapshotName,
+          total: snapshotTotal,
+          items: snapshotItems,
+          isSavedInDb: true,
+        });
         clearCart();
-        router.push(`/order-success/${order.orderNumber}`);
       } else {
-        const err = await res.json();
-        setSubmitError(err.error || 'Failed to place order');
+        // Fallback for read-only demo deployments (e.g., Vercel SQLite)
+        const demoNumber = `SPB-DEMO-${Math.floor(1000 + Math.random() * 9000)}`;
+        setDemoOrderPopup({
+          orderNumber: demoNumber,
+          customerName: snapshotName,
+          total: snapshotTotal,
+          items: snapshotItems,
+          isSavedInDb: false,
+        });
+        clearCart();
       }
-    } catch (err) {
-      setSubmitError('Server connection error. Please try again.');
+    } catch {
+      const demoNumber = `SPB-DEMO-${Math.floor(1000 + Math.random() * 9000)}`;
+      setDemoOrderPopup({
+        orderNumber: demoNumber,
+        customerName,
+        total: finalTotal,
+        items: [...items],
+        isSavedInDb: false,
+      });
+      clearCart();
     } finally {
       setSubmitting(false);
     }
   };
 
-  if (items.length === 0) {
+  if (items.length === 0 && !demoOrderPopup) {
     return (
       <div className="min-h-screen bg-[#FAF8F6] flex flex-col items-center justify-center p-6 text-center">
         <div className="w-20 h-20 rounded-full bg-[#F3E8E2] text-[#C5A059] flex items-center justify-center mb-4">
@@ -451,6 +487,105 @@ export default function CheckoutPage() {
         </div>
 
       </div>
+
+      {/* Demo Mode Order Pop-Up Modal */}
+      {demoOrderPopup && (
+        <div className="fixed inset-0 z-50 bg-[#1F1A18]/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-[#E8DDD7] shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+            <button
+              onClick={() => {
+                setDemoOrderPopup(null);
+                router.push('/shop');
+              }}
+              className="absolute top-5 right-5 text-[#8A7F7A] hover:text-[#1F1A18] p-1 transition-colors cursor-pointer"
+              aria-label="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 rounded-full bg-[#C5A059]/15 text-[#C5A059] flex items-center justify-center mx-auto">
+                <Info className="w-8 h-8" />
+              </div>
+
+              <div>
+                <span className="inline-flex items-center gap-1.5 bg-[#1F1A18] text-white px-3.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] mb-2">
+                  <Sparkles className="w-3 h-3 text-[#C5A059]" />
+                  <span>Demo Mode Notice</span>
+                </span>
+                <h2 className="font-serif text-2xl sm:text-3xl text-[#1F1A18] font-normal">
+                  Website Is Currently in Demo Mode
+                </h2>
+                <p className="text-xs sm:text-sm text-[#8A7F7A] mt-2 leading-relaxed">
+                  Thank you, <strong>{demoOrderPopup.customerName || 'Gorgeous'}</strong>! This website is currently running in <strong>Demo / Preview Mode</strong>, so your order (<strong>{demoOrderPopup.orderNumber}</strong>) is a demo preview and no payment or live shipment has been processed.
+                </p>
+              </div>
+
+              {/* Order Preview Box */}
+              <div className="bg-[#FAF8F6] rounded-2xl p-4 border border-[#E8DDD7] text-left text-xs space-y-2">
+                <div className="flex justify-between font-semibold text-[#1F1A18] pb-2 border-b border-[#E8DDD7]">
+                  <span>Preview Ref: {demoOrderPopup.orderNumber}</span>
+                  <span className="text-[#C5A059]">{formatPrice(demoOrderPopup.total)}</span>
+                </div>
+                <div className="space-y-1 max-h-28 overflow-y-auto text-[#8A7F7A]">
+                  {demoOrderPopup.items.map((it, idx) => (
+                    <div key={idx} className="flex justify-between">
+                      <span className="truncate pr-2">
+                        {it.quantity}x {it.name} ({it.shape}, {it.size})
+                      </span>
+                      <span className="font-medium text-[#1F1A18] flex-shrink-0">
+                        {formatPrice(it.price * it.quantity)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <p className="text-[11px] text-[#8A7F7A]">
+                Want to place a real custom order with Ish? Tap below to send your selected sets directly on WhatsApp!
+              </p>
+
+              {/* Actions */}
+              <div className="flex flex-col sm:flex-row gap-3 pt-1">
+                <a
+                  href={`https://wa.me/919322118970?text=${encodeURIComponent(
+                    `Hi Ish! I tried ordering on your website (${demoOrderPopup.orderNumber}):\n` +
+                      demoOrderPopup.items
+                        .map((it) => `- ${it.quantity}x ${it.name} (${it.shape}, ${it.length}, Size ${it.size})`)
+                        .join('\n') +
+                      `\nTotal: ${formatPrice(demoOrderPopup.total)}`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 bg-[#25D366] hover:bg-[#20ba59] text-white py-3.5 px-5 rounded-full text-xs font-semibold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors shadow-md"
+                >
+                  <WhatsAppIcon className="w-4 h-4" />
+                  <span>Order on WhatsApp</span>
+                </a>
+
+                {demoOrderPopup.isSavedInDb ? (
+                  <button
+                    onClick={() => router.push(`/order-success/${demoOrderPopup.orderNumber}`)}
+                    className="flex-1 bg-[#1F1A18] hover:bg-[#C5A059] text-white py-3.5 px-5 rounded-full text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer"
+                  >
+                    View Demo Receipt
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setDemoOrderPopup(null);
+                      router.push('/shop');
+                    }}
+                    className="flex-1 border border-[#1F1A18] text-[#1F1A18] hover:bg-[#1F1A18] hover:text-white py-3.5 px-5 rounded-full text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer"
+                  >
+                    Continue Exploring
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
