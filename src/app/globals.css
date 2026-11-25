@@ -1,0 +1,297 @@
+@import "tailwindcss";
+@source "..";
+
+
+:root {
+  --background: #FAF8F6;
+  --foreground: #1F1A18;
+  --blush: #F3E8E2;
+  --gold: #C5A059;
+  --gold-light: #D4B87A;
+  --gold-dark: #A88840;
+  --cream: #FFF9F5;
+  --charcoal: #1F1A18;
+  --charcoal-light: #3D3533;
+  --muted: #8A7F7A;
+  --border: #E8DDD7;
+  --success: #4CAF50;
+  --error: #E53935;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-blush: var(--blush);
+  --color-gold: var(--gold);
+  --color-gold-light: var(--gold-light);
+  --color-gold-dark: var(--gold-dark);
+  --color-cream: var(--cream);
+  --color-charcoal: var(--charcoal);
+  --color-charcoal-light: var(--charcoal-light);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-success: var(--success);
+  --color-error: var(--error);
+  --font-serif: var(--font-serif);
+  --font-sans: var(--font-sans);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--charcoal);
+  }
+}
+
+/* Standardized Luxury Button Utilities */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  border-radius: 9999px;
+  background-color: #1F1A18;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+}
+.btn-primary:hover {
+  background-color: #C5A059;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(197, 160, 89, 0.25);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  border-radius: 9999px;
+  border: 1px solid #1F1A18;
+  background-color: transparent;
+  color: #1F1A18;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+.btn-secondary:hover {
+  background-color: #1F1A18;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.btn-light {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  border-radius: 9999px;
+  background-color: #FAF8F6;
+  color: #1F1A18;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+}
+.btn-light:hover {
+  background-color: #C5A059;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--blush);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--gold);
+  border-radius: 3px;
+}
+
+/* Announcement bar animation */
+@keyframes slideUp {
+  0% { transform: translateY(100%); opacity: 0; }
+  10% { transform: translateY(0); opacity: 1; }
+  90% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-100%); opacity: 0; }
+}
+
+.announcement-slide {
+  animation: slideUp 4s ease-in-out;
+}
+
+/* Product card hover zoom */
+.product-image-hover {
+  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.product-image-hover:hover {
+  transform: scale(1.05);
+}
+
+/* Masonry grid */
+.masonry-grid {
+  columns: 3;
+  column-gap: 1rem;
+}
+.masonry-grid > * {
+  break-inside: avoid;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+  .masonry-grid {
+    columns: 2;
+  }
+}
+
+@media (max-width: 480px) {
+  .masonry-grid {
+    columns: 1;
+  }
+}
+
+/* Star rating */
+.star-filled {
+  color: var(--gold);
+}
+.star-empty {
+  color: var(--border);
+}
+
+/* Slide-out drawer */
+.drawer-overlay {
+  background: rgba(31, 26, 24, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+/* Price styling */
+.price-original {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+/* Badge */
+.discount-badge {
+  background: var(--error);
+  color: white;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 2px;
+  font-weight: 600;
+}
+
+/* Button styles */
+.btn-primary {
+  background: var(--charcoal);
+  color: white;
+  padding: 12px 32px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.btn-primary:hover {
+  background: var(--gold);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--charcoal);
+  padding: 12px 32px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border: 1.5px solid var(--charcoal);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.btn-outline:hover {
+  background: var(--charcoal);
+  color: white;
+}
+
+.btn-gold {
+  background: var(--gold);
+  color: white;
+  padding: 12px 32px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.btn-gold:hover {
+  background: var(--gold-dark);
+}
+
+/* Input styles */
+input, textarea, select {
+  font-family: var(--font-sans);
+}
+
+.input-luxury {
+  border: 1px solid var(--border);
+  padding: 12px 16px;
+  font-size: 0.875rem;
+  background: white;
+  transition: border-color 0.3s;
+  outline: none;
+  width: 100%;
+}
+.input-luxury:focus {
+  border-color: var(--gold);
+}
+
+/* Skeleton loading */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--blush) 25%, var(--cream) 50%, var(--blush) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
